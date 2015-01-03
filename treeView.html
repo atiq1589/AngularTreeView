@@ -1,0 +1,150 @@
+<html>
+<head>
+   <title>Angular JS Custom Directives</title>
+</head>
+<body >
+   
+   <div ng-app="mainApp"  ng-controller="tree">
+		<script type="text/ng-template" id="treeLevel.html">
+			<ul>
+				<li ng-repeat="a in Tree">
+					{{a.Name}}
+					<div ng-include=" 'treeLevel.html' " onload="Tree = a.Childs"></div>
+				</li>
+			</ul>
+		</script>
+	<div ng-include=" 'treeLevel.html' "></div>
+	
+	<student  name="Mahesh"></student>
+
+	<atiq  data-treelist="Tree" data-childs="Childs">	</atiq>
+	</div>
+	
+	
+	
+   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+   
+   
+   <script>
+      var mainApp = angular.module("mainApp", []);
+	 
+		mainApp.directive("atiq",['$compile', function($compile){
+			var directive = {};
+			directive.restrict = 'E';
+			//directive.templateUrl = "template/dashboard.html";
+			//directive.template = "<ul>"+
+			//"	<li ng-repeat=\"a in T\">"+
+			//"		{{a.name}}"+
+			
+			//"		<div ng-include=\"'template/dashboard.html'\" onload=\"T = a.Childs\"></div>"+
+			//"		<div data-treelist=\"'a.Childs'\"></div>"+
+			//"	</li>"+
+			//"</ul>"
+			
+			directive.scope = {
+				n: "=treelist",
+				c: "=childs"
+			};
+			directive.replace=true;
+			directive.compile = function(element, attributes) {
+				var linkFunction = function(scope, element, attributes) {
+				   scope.T = scope.n;
+				   var data = attributes.treelist;
+				   var childs = attributes.childs;
+					var template = '<ul>'+
+					'	<li data-ng-repeat="a in T">'+
+					'		{{a.Name}}'+
+					'		<atiq data-treelist="a.'+childs+'" data-childs="'+childs+'"></atiq>'+
+					'	</li>'+
+					'</ul>'
+					element.html(null).append($compile(template)(scope));
+				}
+				return linkFunction;
+			 }
+
+			return directive;
+		}]);
+		mainApp.run(["$templateCache", function ($templateCache) {
+			$templateCache.put("template/dashboard.html",
+			"<ul>"+
+			"	<li ng-repeat=\"a in T\">"+
+			"		{{a.name}}"+
+			"		<div ng-include=\"'template/dashboard.html'\" onload=\"T = a.Childs\"></div>"+
+			"	</li>"+
+			"</ul>"
+			)
+		}]);
+      mainApp.directive('student', function() {
+         var directive = {};
+         directive.restrict = 'E';
+         directive.template = "Student: <b>{{S.name}}</b> , Roll No: <b>{{S.rollno}}</b>";
+         
+         directive.scope = {
+            student : "=name"
+         }
+		 
+         directive.compile = function(element, attributes) {
+            element.css("border", "1px solid #cccccc");
+
+            var linkFunction = function($scope, element, attributes) {
+				$scope.S = $scope.student;
+               //element.html("Student: <b>"+$scope.student.name +"</b> , Roll No: <b>"+$scope.student.rollno+"</b><br/>");
+               element.css("background-color", "#ff00ff");
+            }
+
+            return linkFunction;
+         }
+
+         return directive;
+      });
+	  
+      mainApp.controller('StudentController', function($scope) {
+            $scope.Mahesh = {};
+            $scope.Mahesh.name = "Mahesh Parashar";
+            $scope.Mahesh.rollno  = 1;
+
+            $scope.Piyush = {};
+            $scope.Piyush.name = "Piyush Parashar";
+            $scope.Piyush.rollno  = 2;
+      });
+       mainApp.controller("tree", function($scope){
+	   $scope.Mahesh = {};
+            $scope.Mahesh.name = "Mahesh Parashar";
+            $scope.Mahesh.rollno  = 1;
+
+            $scope.Piyush = {};
+            $scope.Piyush.name = "Piyush Parashar";
+            $scope.Piyush.rollno  = 2;
+		$scope.Tree = [
+			{
+				Name: "A",
+				Childs: [
+					{
+						Name: "AA",
+						Childs:[
+							{Name: "AAA"},
+							{Name: "AAB"},
+							{Name: "AAC"}
+						]
+					},
+					{
+						Name: "AB"
+					}
+				]
+			},
+			{
+				Name: "B",
+				Childs: [
+					{
+						Name: "BA"
+					},
+					{
+						Name: "BB"
+					}
+				]
+			}
+		]
+	  });
+   </script>
+</body>
+</html>
